@@ -15,7 +15,7 @@ composition type, sub-components, Cangjie signature, and Kangxi radical.
 npm install chinese-characters-decomposition
 ```
 
-The package ships a compiled ESM bundle (`index.js`) with TypeScript
+The package ships an ESM entry point (`index.js`) with TypeScript
 declarations (`index.d.ts`), so it works in any modern Node.js, TypeScript,
 or bundled environment. If you only need the raw data, import
 `chinese-characters-decomposition/ccd.json` to skip the JS wrapper.
@@ -23,7 +23,7 @@ or bundled environment. If you only need the raw data, import
 ## Usage
 
 ```ts
-import { ccd, type CcdEntry } from "chinese-characters-decomposition";
+import ccd, { type CcdEntry } from "chinese-characters-decomposition";
 
 const entry: CcdEntry | undefined = ccd.find((e) => e.component === "好");
 // {
@@ -64,15 +64,13 @@ import dataset from "chinese-characters-decomposition/ccd.json";
 In the source TSV, missing/atomic sub-components and sections are encoded as
 `*`; this parser converts them to `null`.
 
-## Regenerating `ccd.json` and the bundle
+## Regenerating `ccd.json`
 
-`scripts/parse.ts` rebuilds `ccd.json` from `data/ccd.tsv`, and `vp pack`
-bundles `src/index.ts` into `index.js` + `index.d.ts`. Both run
+`scripts/parse.ts` rebuilds `ccd.json` from `data/ccd.tsv`. It runs
 automatically on `npm publish` via `prepublishOnly`.
 
 ```sh
-bun run parse   # regenerate ccd.json only
-bun run build   # regenerate ccd.json and rebuild index.js + index.d.ts
+bun run build   # regenerate ccd.json from data/ccd.tsv
 ```
 
 ## License

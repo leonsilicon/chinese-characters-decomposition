@@ -42,10 +42,5 @@ export interface CcdEntry {
 /** The full CCD dataset as an array of {@link CcdEntry} records. */
 export type CcdDataset = CcdEntry[];
 
-/**
- * The full Chinese Characters Decomposition (CCD) dataset, parsed from
- * `data/ccd.tsv` into a typed JSON array.
- */
-export declare const ccd: CcdDataset;
-
+declare const ccd: CcdDataset;
 export default ccd;

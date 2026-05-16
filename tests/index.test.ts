@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { ccd } from "../index.js";
+import ccd from "../index.js";
 
 test("dataset is non-empty", () => {
   expect(ccd.length).toBeGreaterThan(20000);
