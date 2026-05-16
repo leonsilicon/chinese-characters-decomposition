@@ -1,0 +1,64 @@
+{
+  "name": "chinese-characters-decomposition",
+  "version": "0.0.0",
+  "description": "Typed JSON dataset of Chinese character decompositions (CCD), with a parser for the source TSV.",
+  "keywords": [
+    "ccd",
+    "characters",
+    "chinese",
+    "cjk",
+    "dataset",
+    "decomposition",
+    "hanzi",
+    "kanji",
+    "radicals"
+  ],
+  "homepage": "https://github.com/leonsilicon/chinese-characters-decomposition#readme",
+  "bugs": {
+    "url": "https://github.com/leonsilicon/chinese-characters-decomposition/issues"
+  },
+  "license": "MIT",
+  "author": "Leon Silicon <leon@leonsilicon.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leonsilicon/chinese-characters-decomposition.git"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "ccd.json"
+  ],
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./ccd.json": "./ccd.json",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "bun run scripts/parse.ts",
+    "test": "vp test",
+    "check": "vp check",
+    "prepublishOnly": "bun run scripts/parse.ts",
+    "prepare": "vp config"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.2",
+    "@typescript/native-preview": "7.0.0-dev.20260509.2",
+    "bumpp": "^11.1.0",
+    "typescript": "^6.0.3",
+    "vite-plus": "^0.1.20"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+  },
+  "packageManager": "bun@1.3.14"
+}
