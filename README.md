@@ -22,22 +22,28 @@ or bundled environment. If you only need the raw data, import
 
 ## Usage
 
-```ts
-import ccd, { type CcdEntry } from "chinese-characters-decomposition";
+The dataset is a `{ headers, rows }` object: `headers` is the ordered list of
+column names, and `rows` is an array of tuples aligned with those columns.
 
-const entry: CcdEntry | undefined = ccd.find((e) => e.component === "好");
-// {
-//   component: "好",
-//   strokes: 6,
-//   compositionType: "吅",
-//   leftComponent: "女",
-//   leftStrokes: 3,
-//   rightComponent: "子",
-//   rightStrokes: 3,
-//   signature: "VND",
-//   notes: "/",
-//   section: "女",
-// }
+```ts
+import ccd, { type CcdRow } from "chinese-characters-decomposition";
+
+const row: CcdRow | undefined = ccd.rows.find((r) => r[0] === "好");
+// ["好", 6, "吅", "女", 3, "子", 3, "VND", "/", "女"]
+//   │    │   │    │    │   │    │    │     │    └─ section
+//   │    │   │    │    │   │    │    │     └────── notes
+//   │    │   │    │    │   │    │    └──────────── signature
+//   │    │   │    │    │   │    └───────────────── rightStrokes
+//   │    │   │    │    │   └────────────────────── rightComponent
+//   │    │   │    │    └────────────────────────── leftStrokes
+//   │    │   │    └─────────────────────────────── leftComponent
+//   │    │   └──────────────────────────────────── compositionType
+//   │    └──────────────────────────────────────── strokes
+//   └───────────────────────────────────────────── component
+
+ccd.headers;
+// ["component", "strokes", "compositionType", "leftComponent", "leftStrokes",
+//  "rightComponent", "rightStrokes", "signature", "notes", "section"]
 ```
 
 Or import the raw JSON directly:
@@ -46,27 +52,29 @@ Or import the raw JSON directly:
 import dataset from "chinese-characters-decomposition/ccd.json";
 ```
 
-## Entry shape
+## Row shape
 
-| Field             | Type             | Description                                                    |
-| ----------------- | ---------------- | -------------------------------------------------------------- |
-| `component`       | `string`         | The character being decomposed.                                |
-| `strokes`         | `number`         | Total stroke count.                                            |
-| `compositionType` | `string`         | Structure indicator (`一`, `吕`, `回`, `吅`, `咒`, …, or `*`). |
-| `leftComponent`   | `string \| null` | First sub-component (`null` when atomic).                      |
-| `leftStrokes`     | `number`         | Stroke count of the first sub-component.                       |
-| `rightComponent`  | `string \| null` | Second sub-component (`null` when atomic).                     |
-| `rightStrokes`    | `number`         | Stroke count of the second sub-component.                      |
-| `signature`       | `string`         | Cangjie-style code (may be empty).                             |
-| `notes`           | `string`         | Free-form source notes (`/`, `*/`, `?/`, …).                   |
-| `section`         | `string \| null` | Kangxi radical the character is filed under.                   |
+Each row is a tuple whose positions line up with `headers`:
+
+| Index | Header            | Type             | Description                                                    |
+| ----- | ----------------- | ---------------- | -------------------------------------------------------------- |
+| 0     | `component`       | `string`         | The character being decomposed.                                |
+| 1     | `strokes`         | `number`         | Total stroke count.                                            |
+| 2     | `compositionType` | `string`         | Structure indicator (`一`, `吕`, `回`, `吅`, `咒`, …, or `*`). |
+| 3     | `leftComponent`   | `string \| null` | First sub-component (`null` when atomic).                      |
+| 4     | `leftStrokes`     | `number`         | Stroke count of the first sub-component.                       |
+| 5     | `rightComponent`  | `string \| null` | Second sub-component (`null` when atomic).                     |
+| 6     | `rightStrokes`    | `number`         | Stroke count of the second sub-component.                      |
+| 7     | `signature`       | `string`         | Cangjie-style code (may be empty).                             |
+| 8     | `notes`           | `string`         | Free-form source notes (`/`, `*/`, `?/`, …).                   |
+| 9     | `section`         | `string \| null` | Kangxi radical the character is filed under.                   |
 
 In the source TSV, missing/atomic sub-components and sections are encoded as
 `*`; this parser converts them to `null`.
 
 ## Regenerating `ccd.json`
 
-`scripts/parse.ts` rebuilds `ccd.json` from `data/ccd.tsv`. It runs
+`_build.ts` rebuilds `ccd.json` from `data/ccd.tsv`. It runs
 automatically on `npm publish` via `prepublishOnly`.
 
 ```sh

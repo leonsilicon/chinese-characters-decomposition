@@ -43,10 +43,10 @@
     "access": "public"
   },
   "scripts": {
-    "build": "bun run scripts/parse.ts",
+    "build": "bun run _build.ts",
     "test": "vp test",
     "check": "vp check",
-    "prepublishOnly": "bun run scripts/parse.ts",
+    "prepublishOnly": "bun run _build.ts",
     "prepare": "vp config"
   },
   "devDependencies": {

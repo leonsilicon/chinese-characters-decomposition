@@ -1,17 +1,30 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { CcdDataset, CcdEntry } from "../index.d.ts";
+import type { CcdDataset, CcdRow } from "./index.d.ts";
 
-const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..");
+const rootDir = dirname(fileURLToPath(import.meta.url));
 const inputPath = join(rootDir, "data", "ccd.tsv");
 const outputPath = join(rootDir, "ccd.json");
 
 const EXPECTED_COLUMNS = 10;
 const PLACEHOLDER = "*";
 
+const HEADERS = [
+  "component",
+  "strokes",
+  "compositionType",
+  "leftComponent",
+  "leftStrokes",
+  "rightComponent",
+  "rightStrokes",
+  "signature",
+  "notes",
+  "section",
+] as const;
+
 function parseTsv(raw: string): CcdDataset {
-  const entries: CcdEntry[] = [];
+  const rows: CcdRow[] = [];
 
   for (const [index, rawLine] of raw.split("\n").entries()) {
     const line = rawLine.replace(/\r$/, "");
@@ -50,37 +63,38 @@ function parseTsv(raw: string): CcdDataset {
       section,
     ] = fields as [string, string, string, string, string, string, string, string, string, string];
 
-    entries.push({
+    rows.push([
       component,
-      strokes: Number(strokes),
+      Number(strokes),
       compositionType,
-      leftComponent: leftComponent === PLACEHOLDER ? null : leftComponent,
-      leftStrokes: Number(leftStrokes),
-      rightComponent: rightComponent === PLACEHOLDER ? null : rightComponent,
-      rightStrokes: Number(rightStrokes),
+      leftComponent === PLACEHOLDER ? null : leftComponent,
+      Number(leftStrokes),
+      rightComponent === PLACEHOLDER ? null : rightComponent,
+      Number(rightStrokes),
       signature,
       notes,
-      section: section === PLACEHOLDER ? null : section,
-    });
+      section === PLACEHOLDER ? null : section,
+    ]);
   }
 
-  return entries;
+  return { headers: [...HEADERS], rows };
 }
 
 const raw = readFileSync(inputPath, "utf8");
 const dataset = parseTsv(raw);
 
-for (const entry of dataset) {
-  if (!Number.isFinite(entry.strokes)) {
-    throw new Error(`Invalid strokes for ${entry.component}`);
+for (const row of dataset.rows) {
+  const [component, strokes, , , leftStrokes, , rightStrokes] = row;
+  if (!Number.isFinite(strokes)) {
+    throw new Error(`Invalid strokes for ${component}`);
   }
-  if (!Number.isFinite(entry.leftStrokes)) {
-    throw new Error(`Invalid leftStrokes for ${entry.component}`);
+  if (!Number.isFinite(leftStrokes)) {
+    throw new Error(`Invalid leftStrokes for ${component}`);
   }
-  if (!Number.isFinite(entry.rightStrokes)) {
-    throw new Error(`Invalid rightStrokes for ${entry.component}`);
+  if (!Number.isFinite(rightStrokes)) {
+    throw new Error(`Invalid rightStrokes for ${component}`);
   }
 }
 
-writeFileSync(outputPath, `${JSON.stringify(dataset, null, 2)}\n`, "utf8");
-console.log(`Wrote ${dataset.length} entries to ${outputPath}`);
+writeFileSync(outputPath, `${JSON.stringify(dataset)}\n`, "utf8");
+console.log(`Wrote ${dataset.rows.length} rows to ${outputPath}`);
